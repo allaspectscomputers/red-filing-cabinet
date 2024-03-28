@@ -1,0 +1,51 @@
+```csharp
+using System;
+using System.Data.SQLite;
+
+class DatabaseInitialization
+{
+    static void Main(string[] args)
+    {
+        string connectionString = "Data Source=escrowDatabase.sqlite;Version=3;";
+        using (var connection = new SQLiteConnection(connectionString))
+        {
+            connection.Open();
+
+            string[] sqlCommands = new string[]
+            {
+                "CREATE TABLE IF NOT EXISTS Documents (DocumentID INTEGER PRIMARY KEY AUTOINCREMENT, DocumentCategory TEXT, Version INTEGER, DocumentDescription TEXT, DocumentName TEXT, CreationDate TEXT, LastModifiedDate TEXT);",
+                
+                "CREATE TABLE IF NOT EXISTS Escrows (EscrowID INTEGER PRIMARY KEY AUTOINCREMENT, EscrowType TEXT, LoanOfficerID INTEGER, TitleCompanyID INTEGER, StartDate TEXT, EndDate TEXT, Status TEXT);",
+                
+                "CREATE TABLE IF NOT EXISTS Parties (PartyID INTEGER PRIMARY KEY AUTOINCREMENT, Address TEXT, RoleDescription TEXT, Name TEXT, Email TEXT, PhoneNumber TEXT);",
+                
+                "CREATE TABLE IF NOT EXISTS Signatures (SignatureID INTEGER PRIMARY KEY AUTOINCREMENT, DocumentID INTEGER, PartyID INTEGER, SignatureDate TEXT, SignatureType TEXT);",
+                
+                "CREATE TABLE IF NOT EXISTS AuditLogs (LogID INTEGER PRIMARY KEY AUTOINCREMENT, IPAddress TEXT, DeviceType TEXT, ActionPerformed TEXT, ActionDate TEXT);",
+                
+                "CREATE TABLE IF NOT EXISTS Notifications (NotificationID INTEGER PRIMARY KEY AUTOINCREMENT, ReadStatus TEXT, Priority TEXT, SentDate TEXT, NotificationType TEXT);",
+                
+                "CREATE TABLE IF NOT EXISTS Properties (PropertyID INTEGER PRIMARY KEY AUTOINCREMENT, ParcelNumber TEXT, LegalDescription TEXT, Address TEXT, OwnerID INTEGER);",
+                
+                "CREATE TABLE IF NOT EXISTS Transactions (TransactionID INTEGER PRIMARY KEY AUTOINCREMENT, EscrowID INTEGER, TransactionType TEXT, Amount REAL, TransactionDate TEXT, Status TEXT, RelatedPartyID INTEGER);",
+                
+                "CREATE TABLE IF NOT EXISTS DocumentRequests (RequestID INTEGER PRIMARY KEY AUTOINCREMENT, DocumentID INTEGER, RequestedByPartyID INTEGER, RequestDate TEXT, DueDate TEXT, FulfillmentStatus TEXT);",
+                
+                "CREATE TABLE IF NOT EXISTS LoanDetails (LoanID INTEGER PRIMARY KEY AUTOINCREMENT, EscrowID INTEGER, LoanAmount REAL, LoanType TEXT, InterestRate REAL, LoanTerm INTEGER, LoanOfficerID INTEGER);",
+                
+                "CREATE TABLE IF NOT EXISTS TitleCompanies (TitleCompanyID INTEGER PRIMARY KEY AUTOINCREMENT, CompanyName TEXT, ContactInfo TEXT, Address TEXT);"
+            };
+
+            foreach (string sqlCommand in sqlCommands)
+            {
+                using (var command = new SQLiteCommand(sqlCommand, connection))
+                {
+                    command.ExecuteNonQuery();
+                }
+            }
+
+            Console.WriteLine("Database and tables created successfully.");
+        }
+    }
+}
+```
